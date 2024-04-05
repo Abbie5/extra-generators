@@ -13,10 +13,9 @@ import me.shedaniel.rei.api.client.registry.category.CategoryRegistry
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry
 import me.shedaniel.rei.api.common.util.EntryIngredients
 import me.shedaniel.rei.api.common.util.EntryStacks
-import net.minecraft.item.ItemGroup
 import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
 import net.minecraft.util.collection.DefaultedList
-import net.minecraft.util.registry.Registry
 
 class ReiCompat: REIClientPlugin {
 
@@ -45,7 +44,6 @@ class ReiCompat: REIClientPlugin {
             THERMOELECTRIC_GENERATOR.createDisplay(block, temperature).let { registry.add(it) }
         }
         val items = DefaultedList.of<ItemStack>()
-        ItemGroup.SEARCH.appendStacks(items)
         items.forEach {
             GeneratorFuel.fromBurnableGeneratorFuel(it.item)?.run {
                 BURNABLE_GENERATOR.createDisplay(EntryIngredients.of(it.item), this)
@@ -66,9 +64,9 @@ class ReiCompat: REIClientPlugin {
                 STEAM_GENERATOR.createDisplay(EntryIngredients.of(it), EntryIngredients.of(fluidInput.resource.fluid, fluidInput.amount/81), this)
             }?.let { display -> registry.add(display) }
         }
-        val redInput = Registry.ITEM.indexedEntries.filter { it.isIn(ExtraGenerators.RED_ITEMS) }.map { EntryStacks.of(it.value()) }
-        val blueInput = Registry.ITEM.indexedEntries.filter { it.isIn(ExtraGenerators.GREEN_ITEMS) }.map { EntryStacks.of(it.value()) }
-        val greenInput = Registry.ITEM.indexedEntries.filter { it.isIn(ExtraGenerators.BLUE_ITEMS) }.map { EntryStacks.of(it.value()) }
+        val redInput = Registries.ITEM.indexedEntries.filter { it.isIn(ExtraGenerators.RED_ITEMS) }.map { EntryStacks.of(it.value()) }
+        val blueInput = Registries.ITEM.indexedEntries.filter { it.isIn(ExtraGenerators.GREEN_ITEMS) }.map { EntryStacks.of(it.value()) }
+        val greenInput = Registries.ITEM.indexedEntries.filter { it.isIn(ExtraGenerators.BLUE_ITEMS) }.map { EntryStacks.of(it.value()) }
         COLORFUL_GENERATOR.createDisplay(redInput, blueInput, greenInput, ColorfulGeneratorBlockEntity.getFuel()).let { registry.add(it) }
     }
 

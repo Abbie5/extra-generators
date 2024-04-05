@@ -27,7 +27,7 @@ class FluidItemGeneratorScreenHandler(syncId: Int, playerInventory: PlayerInvent
         addSlot(SimpleSidedInventory.SimpleSlot(entity.itemInv, 2, 116, 53))
     }
 
-    override fun transferSlot(player: PlayerEntity?, index: Int): ItemStack {
+    override fun quickMove(player: PlayerEntity?, index: Int): ItemStack {
         var itemStack = ItemStack.EMPTY
         val slot = this.slots[index]
         if (slot.hasStack()) {

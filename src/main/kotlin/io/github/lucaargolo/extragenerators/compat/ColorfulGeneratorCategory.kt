@@ -36,9 +36,9 @@ class ColorfulGeneratorCategory(private val id: String, private val block: Block
 
         widgets.add(Widgets.createCategoryBase(bounds))
 
-        widgets.add(Widgets.createDrawableWidget { _, m, _, _, _ -> m.scale(2f, 2f, 1f)})
+        widgets.add(Widgets.createDrawableWidget { c, _, _, _ -> c.matrices.scale(2f, 2f, 1f)})
         widgets.add(Widgets.createSlot(Point(bounds.x/2 + 3, bounds.y/2 + 3)).entry(EntryStacks.of(block)).disableBackground().disableHighlight().disableTooltips())
-        widgets.add(Widgets.createDrawableWidget { _, m, _, _, _ -> m.scale(0.5f, 0.5f, 1f)})
+        widgets.add(Widgets.createDrawableWidget { c, _, _, _ -> c.matrices.scale(0.5f, 0.5f, 1f)})
 
         widgets.add(Widgets.createBurningFire(Point(bounds.x+44, bounds.y+4)).animationDurationTicks(display.output.burnTime.toDouble()))
         widgets.add(Widgets.createSlot(Point(bounds.x+44, bounds.y+22)).entries(display.redInput))
@@ -48,13 +48,13 @@ class ColorfulGeneratorCategory(private val id: String, private val block: Block
         widgets.add(Widgets.createLabel(Point(bounds.x+67, bounds.y+8), Text.translatable("screen.extragenerators.rei.energy_output")).leftAligned())
         widgets.add(Widgets.createLabel(Point(bounds.x+145, bounds.y+26), Text.of("${display.output.energyOutput} E")).rightAligned())
 
-        widgets.add(Widgets.createDrawableWidget { _, matrices, mouseX, mouseY, _ ->
+        widgets.add(Widgets.createDrawableWidget { context, mouseX, mouseY, _ ->
             val tooltip = listOf(
                 Text.translatable("screen.extragenerators.rei.burn_time", display.output.burnTime),
                 Text.translatable("screen.extragenerators.rei.burn_rate", MathHelper.floor(display.output.energyOutput/display.output.burnTime))
             )
             if(mouseX in (bounds.x+44..bounds.x+62) && mouseY in (bounds.y+4..bounds.y+22)) {
-                MinecraftClient.getInstance().currentScreen?.renderTooltip(matrices, tooltip, mouseX, mouseY)
+                context.drawTooltip(MinecraftClient.getInstance().textRenderer, tooltip, mouseX, mouseY)
             }
         })
 

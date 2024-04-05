@@ -27,7 +27,7 @@ import net.minecraft.text.TextColor
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3f
+import org.joml.Vector3f
 import java.awt.Color
 
 class ThermoelectricGeneratorCategory(private val id: String, private val block: Block): DisplayCategory<ThermoelectricGeneratorCategory.RecipeDisplay> {
@@ -46,9 +46,9 @@ class ThermoelectricGeneratorCategory(private val id: String, private val block:
 
         widgets.add(Widgets.createCategoryBase(bounds))
 
-        widgets.add(Widgets.createDrawableWidget { _, m, _, _, _ -> m.scale(2f, 2f, 1f)})
+        widgets.add(Widgets.createDrawableWidget { c, _, _, _ -> c.matrices.scale(2f, 2f, 1f)})
         widgets.add(Widgets.createSlot(Point(bounds.x/2 + 3, bounds.y/2 + 3)).entry(EntryStacks.of(block)).disableBackground().disableHighlight().disableTooltips())
-        widgets.add(Widgets.createDrawableWidget { _, m, _, _, _ -> m.scale(0.5f, 0.5f, 1f)})
+        widgets.add(Widgets.createDrawableWidget { c, _, _, _ -> c.matrices.scale(0.5f, 0.5f, 1f)})
 
         val baseColor = Triple(1f, 1f, 1f)
 
@@ -69,13 +69,14 @@ class ThermoelectricGeneratorCategory(private val id: String, private val block:
 
         widgets.add(Widgets.createLabel(Point(bounds.x+75, bounds.y+18), text))
 
-        widgets.add(Widgets.createDrawableWidget { draw, matrices, _, _, _ ->
+        widgets.add(Widgets.createDrawableWidget { context, _, _, _ ->
+            val matrices = context.matrices
             matrices.push()
-            matrices.translate(bounds.x + 143.0, bounds.y + 31.0, draw.zOffset + 100.0)
+            matrices.translate(bounds.x + 143.0, bounds.y + 31.0, 100.0)
             matrices.scale(33f, -33f, 1f)
             val client = MinecraftClient.getInstance()
             val immediate = client.bufferBuilders.entityVertexConsumers
-            val model = client.bakedModelManager.getModel(ModelIdentifier("minecraft:stone#"))
+            val model = client.bakedModelManager.getModel(ModelIdentifier("minecraft", "stone", ""))
             model.transformation.gui.apply(false, matrices)
             val fluidState = display.block.getFluidState(display.block.defaultState)
             if(fluidState.isEmpty) {
@@ -99,7 +100,7 @@ class ThermoelectricGeneratorCategory(private val id: String, private val block:
     }
 
     @Suppress("SameParameterValue")
-    private fun renderFluidVertices(bb: VertexConsumer, entry: MatrixStack.Entry, normal: Vec3f, fluidColor: Int, fluidSprite: Sprite, f: Float, g: Float, h: Float, i: Float, j: Float, k: Float, l: Float, m: Float) {
+    private fun renderFluidVertices(bb: VertexConsumer, entry: MatrixStack.Entry, normal: Vector3f, fluidColor: Int, fluidSprite: Sprite, f: Float, g: Float, h: Float, i: Float, j: Float, k: Float, l: Float, m: Float) {
         bb.vertex(entry.positionMatrix, f, h, j).color((fluidColor shr 16 and 255)/255f, (fluidColor shr 8 and 255)/255f, (fluidColor and 255)/255f, 1f).texture(fluidSprite.maxU, fluidSprite.minV).overlay(OverlayTexture.DEFAULT_UV).light(15728880).normal(entry.normalMatrix, normal.x, normal.y, normal.z).next()
         bb.vertex(entry.positionMatrix, g, h, k).color((fluidColor shr 16 and 255)/255f, (fluidColor shr 8 and 255)/255f, (fluidColor and 255)/255f, 1f).texture(fluidSprite.minU, fluidSprite.minV).overlay(OverlayTexture.DEFAULT_UV).light(15728880).normal(entry.normalMatrix, normal.x, normal.y, normal.z).next()
         bb.vertex(entry.positionMatrix, g, i, l).color((fluidColor shr 16 and 255)/255f, (fluidColor shr 8 and 255)/255f, (fluidColor and 255)/255f, 1f).texture(fluidSprite.minU, fluidSprite.maxV).overlay(OverlayTexture.DEFAULT_UV).light(15728880).normal(entry.normalMatrix, normal.x, normal.y, normal.z).next()

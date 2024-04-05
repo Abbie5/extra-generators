@@ -13,13 +13,17 @@ import io.github.lucaargolo.extragenerators.utils.ActiveGenerators
 import io.github.lucaargolo.extragenerators.utils.ModConfig
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
 import net.fabricmc.api.ModInitializer
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.tag.TagKey
-import net.minecraft.util.registry.Registry
+import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
+import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.tag.TagKey
+import net.minecraft.text.Text
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import java.io.File
@@ -37,15 +41,20 @@ class ExtraGenerators: ModInitializer {
         ScreenHandlerCompendium.initialize()
         ResourceCompendium.initialize()
 
+        Registry.register(Registries.ITEM_GROUP, creativeTabId, creativeTab)
+
         ServerTickEvents.END_SERVER_TICK.register { ActiveGenerators.tick() }
     }
 
     companion object {
         const val MOD_ID = "extragenerators"
 
-        private val creativeTab = FabricItemGroupBuilder.create(ModIdentifier("creative_tab")).icon{ ItemStack(BlockCompendium.BURNABLE_GENERATOR) }.build()
+        val creativeTabId = RegistryKey.of(RegistryKeys.ITEM_GROUP, ModIdentifier("creative_tab"))
+        private val creativeTab = FabricItemGroup.builder()
+            .icon{ ItemStack(BlockCompendium.BURNABLE_GENERATOR) }
+            .displayName(Text.translatable("itemGroup.extragenerators.creative_tab"))
+            .build()
 
-        val PARSER = JsonParser()
         val GSON = GsonBuilder().setPrettyPrinting().create()
         val LOGGER: Logger = LogManager.getLogger("Extra Generators")
         val CONFIG: ModConfig by lazy {
@@ -55,7 +64,7 @@ class ExtraGenerators: ModInitializer {
             try {
                 if (configFile.createNewFile()) {
                     LOGGER.info("No config file found, creating a new one...")
-                    val json: String = GSON.toJson(PARSER.parse(GSON.toJson(ModConfig())))
+                    val json: String = GSON.toJson(JsonParser.parseString(GSON.toJson(ModConfig())))
                     PrintWriter(configFile).use { out -> out.println(json) }
                     finalConfig = ModConfig()
                     LOGGER.info("Successfully created default config file.")
@@ -76,12 +85,12 @@ class ExtraGenerators: ModInitializer {
             finalConfig
         }
 
-        val RED_ITEMS = TagKey.of(Registry.ITEM_KEY, ModIdentifier("red_items"))
-        val GREEN_ITEMS = TagKey.of(Registry.ITEM_KEY, ModIdentifier("green_items"))
-        val BLUE_ITEMS = TagKey.of(Registry.ITEM_KEY, ModIdentifier("blue_items"))
+        val RED_ITEMS = TagKey.of(RegistryKeys.ITEM, ModIdentifier("red_items"))
+        val GREEN_ITEMS = TagKey.of(RegistryKeys.ITEM, ModIdentifier("green_items"))
+        val BLUE_ITEMS = TagKey.of(RegistryKeys.ITEM, ModIdentifier("blue_items"))
 
 
-        fun creativeGroupSettings(): Item.Settings = Item.Settings().group(creativeTab)
+        fun creativeGroupSettings(): Item.Settings = Item.Settings()
     }
 
 }

@@ -1,13 +1,14 @@
 package io.github.lucaargolo.extragenerators.common.resource
 
+import com.google.gson.JsonParser
 import io.github.lucaargolo.extragenerators.ExtraGenerators
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.minecraft.block.Block
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.registry.Registries
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
 import java.io.InputStreamReader
 
 class BlockTemperatureResource: SimpleSynchronousResourceReloadListener {
@@ -20,7 +21,7 @@ class BlockTemperatureResource: SimpleSynchronousResourceReloadListener {
     fun toBuf(buf: PacketByteBuf) {
         buf.writeInt(temperatureMap.size)
         temperatureMap.forEach { (block, temperature) ->
-            buf.writeVarInt(Registry.BLOCK.getRawId(block))
+            buf.writeVarInt(Registries.BLOCK.getRawId(block))
             buf.writeInt(temperature)
         }
     }
@@ -29,7 +30,7 @@ class BlockTemperatureResource: SimpleSynchronousResourceReloadListener {
         clientTemperatureMap.clear()
         val temperatureMapSize = buf.readInt()
         repeat(temperatureMapSize) {
-            val block = Registry.BLOCK.get(buf.readVarInt())
+            val block = Registries.BLOCK.get(buf.readVarInt())
             val temperature = buf.readInt()
             clientTemperatureMap[block] = temperature
         }
@@ -45,11 +46,11 @@ class BlockTemperatureResource: SimpleSynchronousResourceReloadListener {
             val resource = itemsResource.value
             ExtraGenerators.LOGGER.info("Loading $id block temperature resource at $itemsResource.")
             try {
-                val json = ExtraGenerators.PARSER.parse(InputStreamReader(resource.inputStream, "UTF-8"))
+                val json = JsonParser.parseReader(InputStreamReader(resource.inputStream, "UTF-8"))
                 val jsonArray = json.asJsonArray
                 jsonArray.forEach { jsonElement ->
                     val jsonObject = jsonElement.asJsonObject
-                    val block = Registry.BLOCK.get(Identifier(jsonObject.get("block").asString))
+                    val block = Registries.BLOCK.get(Identifier(jsonObject.get("block").asString))
                     val temperature = jsonObject.get("temperature").asInt
                     temperatureMap[block] = temperature
                 }

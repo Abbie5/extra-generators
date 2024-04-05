@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageUtil
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
+import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.*
 import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.client.util.math.MatrixStack
@@ -29,6 +30,7 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtElement
 import net.minecraft.nbt.NbtList
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.registry.Registries
 import net.minecraft.screen.slot.Slot
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
@@ -37,7 +39,6 @@ import net.minecraft.util.Hand
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.registry.Registry
 import org.apache.commons.lang3.math.Fraction
 
 typealias ItemFilter = (slot: Int, stack: ItemStack) -> Boolean
@@ -131,12 +132,12 @@ object InventoryUtils {
     }
 
     fun getExtractableFluid(itemStack: ItemStack): ResourceAmount<FluidVariant>? {
-        val containedFluidStorage = ContainerItemContext.withInitial(itemStack).find(FluidStorage.ITEM)
+        val containedFluidStorage = ContainerItemContext.withConstant(itemStack).find(FluidStorage.ITEM)
         return StorageUtil.findExtractableContent(containedFluidStorage, Transaction.getCurrentUnsafe())
     }
 
     fun canInsertFluid(itemStack: ItemStack): Boolean {
-        val containedFluidStorage = ContainerItemContext.withInitial(itemStack).find(FluidStorage.ITEM)
+        val containedFluidStorage = ContainerItemContext.withConstant(itemStack).find(FluidStorage.ITEM)
         return containedFluidStorage?.supportsInsertion() ?: false
     }
 
@@ -154,7 +155,7 @@ object InventoryUtils {
 
     fun fluidResourceFromJson(json: JsonObject): ResourceAmount<FluidVariant> {
         val fluidId = Identifier(json.get("fluid").asString)
-        val fluid = Registry.FLUID.get(fluidId)
+        val fluid = Registries.FLUID.get(fluidId)
         val variant = FluidVariant.of(fluid)
         val amount = json.get("amount").asLong
         return ResourceAmount(variant, amount)
@@ -179,7 +180,7 @@ fun SimpleSidedInventory.fromNbt(nbt: NbtElement?) {
                         ItemStack.EMPTY
                     } else ItemStack.EMPTY
                     setStack(slot, elementStack)
-                    ExtraGenerators.LOGGER.info("Old LBA item loaded with id ${Registry.ITEM.getId(elementStack.item)} at slot $slot")
+                    ExtraGenerators.LOGGER.info("Old LBA item loaded with id ${Registries.ITEM.getId(elementStack.item)} at slot $slot")
 
                 } catch (e: ClassCastException) {
                     ExtraGenerators.LOGGER.error("Failed to convert old LBA inventory", e)
@@ -203,7 +204,7 @@ fun SingleVariantStorage<FluidVariant>.fromNbt(nbt: NbtCompound) {
                 val oldTank = listElement as NbtCompound
                 val oldAmount = oldTank.getCompound("AmountF")
                 val fluidId = oldTank.getString("ObjName")
-                val fluid = Registry.FLUID.get(Identifier(fluidId))
+                val fluid = Registries.FLUID.get(Identifier(fluidId))
                 if(fluid != Fluids.EMPTY) {
                     val fraction = Fraction.getFraction(oldAmount.getLong("w").toInt(), oldAmount.getLong("n").toInt(), oldAmount.getLong("d").toInt())
                     val newAmount = MathHelper.floor(fraction.toFloat()*81000f)
@@ -245,15 +246,15 @@ fun ResourceAmount<FluidVariant>.toMcBuffer(buf: PacketByteBuf = PacketByteBufs.
     return buf
 }
 
-fun FluidVariant.renderGuiRect(matrices: MatrixStack, startX: Float, startY: Float, height: Float) {
+fun FluidVariant.renderGuiRect(context: DrawContext, startX: Float, startY: Float, height: Float) {
     var vh = height
     var i = 0
     while (vh > 16) {
         vh -= 16
-        innerRenderGuiRect(matrices, startX, startY-(i*16f)-16, 16, 1f)
+        innerRenderGuiRect(context, startX, startY-(i*16f)-16, 16, 1f)
         i++
     }
-    innerRenderGuiRect(matrices, startX, startY-(i*16f)-vh, 16, vh/16f)
+    innerRenderGuiRect(context, startX, startY-(i*16f)-vh, 16, vh/16f)
 }
 
 /*
@@ -261,7 +262,8 @@ fun FluidVariant.renderGuiRect(matrices: MatrixStack, startX: Float, startY: Flo
     Available at: https://github.com/AztechMC/Modern-Industrialization/blob/bb0fa25698f0692ad9c1a3a104544be886856b7a/src/main/java/aztech/modern_industrialization/util/RenderHelper.java#L152
     Thanks Technici4n :3
 */
-private fun FluidVariant.innerRenderGuiRect(ms: MatrixStack, i: Float, j: Float, scale: Int, fractionUp: Float) {
+private fun FluidVariant.innerRenderGuiRect(context: DrawContext, i: Float, j: Float, scale: Int, fractionUp: Float) {
+    val ms = context.matrices
     RenderSystem.setShaderTexture(0, SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)
     val sprite = FluidVariantRendering.getSprite(this)
     val color = FluidVariantRendering.getColor(this)
@@ -271,7 +273,6 @@ private fun FluidVariant.innerRenderGuiRect(ms: MatrixStack, i: Float, j: Float,
     val g = (color shr 8 and 255) / 256f
     val b = (color and 255) / 256f
     RenderSystem.disableDepthTest()
-    RenderSystem.setShader { GameRenderer.getPositionColorTexShader() }
     val bufferBuilder = Tessellator.getInstance().buffer
     bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE)
     val x1 = i + scale
@@ -286,6 +287,6 @@ private fun FluidVariant.innerRenderGuiRect(ms: MatrixStack, i: Float, j: Float,
     bufferBuilder.vertex(model, x1, y1, z).color(r, g, b, a).texture(u1, v1).next()
     bufferBuilder.vertex(model, x1, j, z).color(r, g, b, a).texture(u1, v0).next()
     bufferBuilder.vertex(model, i, j, z).color(r, g, b, a).texture(u0, v0).next()
-    BufferRenderer.drawWithShader(bufferBuilder.end())
+    BufferRenderer.draw(bufferBuilder.end())
     RenderSystem.enableDepthTest()
 }

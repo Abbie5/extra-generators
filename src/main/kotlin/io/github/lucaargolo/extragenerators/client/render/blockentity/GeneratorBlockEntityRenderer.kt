@@ -15,7 +15,7 @@ import net.minecraft.state.property.Properties
 import net.minecraft.util.Util
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.math.Vec3f
+import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.random.Random
 import java.awt.Color
 
@@ -29,15 +29,15 @@ class GeneratorBlockEntityRenderer : BlockEntityRenderer<AbstractGeneratorBlockE
         matrices.push()
         matrices.translate(0.5, 0.5, 0.5)
         when(facing) {
-            Direction.SOUTH -> matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(270f))
-            Direction.NORTH -> matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(90f))
-            Direction.WEST -> matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(180f))
+            Direction.SOUTH -> matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(270f))
+            Direction.NORTH -> matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(90f))
+            Direction.WEST -> matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180f))
             else -> {}
         }
         matrices.translate(-0.5, -0.5, -0.5)
         val cogWheelRotation = MathHelper.lerp(tickDelta, entity.lastCogWheelRotationDegree, entity.cogWheelRotationDegree)
         matrices.translate(8.5/16.0, 6.0/16.0, 6.0/16.0)
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(cogWheelRotation))
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(cogWheelRotation))
         matrices.translate(-8.5/16.0, -6.0/16.0, -6.0/16.0)
         entity.lastCogWheelRotationDegree = cogWheelRotation
         val quads = mutableListOf<BakedQuad>()

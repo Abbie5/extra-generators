@@ -8,6 +8,7 @@ import io.github.lucaargolo.extragenerators.utils.FluidGeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModConfig
 import io.github.lucaargolo.extragenerators.utils.RegistryCompendium
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.fabricmc.fabric.api.`object`.builder.v1.block.FabricBlockSettings
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
@@ -19,19 +20,20 @@ import net.minecraft.fluid.Fluids
 import net.minecraft.item.BlockItem
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.text.*
+import net.minecraft.text.MutableText
+import net.minecraft.text.Text
+import net.minecraft.text.TextColor
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.Rarity
 import net.minecraft.util.Util
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
-import net.minecraft.world.explosion.Explosion
 import java.awt.Color
 
 
-object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
+object BlockCompendium: RegistryCompendium<Block>(Registries.BLOCK) {
 
     //Tier 1 Generators
     val THERMOELECTRIC_GENERATOR = register("thermoelectric_generator", ThermoelectricGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), ExtraGenerators.CONFIG.thermoelectricGenerator))
@@ -51,7 +53,7 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
     val REDSTONE_GENERATOR = register("redstone_generator", FluidItemGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), ExtraGenerators.CONFIG.redstoneGenerator, Fluids.LAVA) { FluidGeneratorFuel.fromRedstoneGeneratorFuel(it) })
     val BLAST_GENERATOR = register("blast_generator", ItemGeneratorBlock(FabricBlockSettings.copyOf(Blocks.IRON_BLOCK).nonOpaque(), ExtraGenerators.CONFIG.blastGenerator, { GeneratorFuel.fromItemResource("blast", it) }) {
         val world = it.world as? ServerWorld ?: return@ItemGeneratorBlock
-        world.createExplosion(null, it.pos.x+0.5, it.pos.y+0.0, it.pos.z+0.5, 2f, Explosion.DestructionType.NONE)
+        world.createExplosion(null, it.pos.x+0.5, it.pos.y+0.0, it.pos.z+0.5, 2f, World.ExplosionSourceType.NONE)
     } )
 
     //Tier 4 Generators
@@ -123,6 +125,9 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
                 }
                 else -> BlockItem(block, creativeGroupSettings())
             }
+        }
+        ItemGroupEvents.modifyEntriesEvent(ExtraGenerators.creativeTabId).register {
+            map.values.forEach(it::add)
         }
     }
 

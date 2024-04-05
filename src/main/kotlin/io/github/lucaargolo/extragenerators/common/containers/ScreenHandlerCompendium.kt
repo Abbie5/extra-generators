@@ -5,12 +5,12 @@ import io.github.lucaargolo.extragenerators.common.blockentity.*
 import io.github.lucaargolo.extragenerators.utils.RegistryCompendium
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType
 import net.minecraft.client.gui.screen.ingame.HandledScreens
+import net.minecraft.registry.Registries
 import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.screen.ScreenHandlerType
-import net.minecraft.util.registry.Registry
 
 @Suppress("UNCHECKED_CAST")
-object ScreenHandlerCompendium: RegistryCompendium<ScreenHandlerType<*>>(Registry.SCREEN_HANDLER) {
+object ScreenHandlerCompendium: RegistryCompendium<ScreenHandlerType<*>>(Registries.SCREEN_HANDLER) {
 
     val ITEM_GENERATOR = register("item_generator", ExtendedScreenHandlerType { i, playerInventory, packetByteBuf ->
         val pos = packetByteBuf.readBlockPos()

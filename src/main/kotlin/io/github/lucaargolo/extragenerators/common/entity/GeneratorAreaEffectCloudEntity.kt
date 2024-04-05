@@ -9,7 +9,8 @@ import net.minecraft.entity.EntityType
 import net.minecraft.entity.effect.StatusEffect
 import net.minecraft.entity.effect.StatusEffectInstance
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.Packet
+import net.minecraft.network.listener.ClientPlayPacketListener
+import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
@@ -44,7 +45,7 @@ class GeneratorAreaEffectCloudEntity(entityType: EntityType<GeneratorAreaEffectC
         }
     }
 
-    override fun createSpawnPacket(): Packet<*> {
+    override fun createSpawnPacket(): Packet<ClientPlayPacketListener>? {
         val buf = PacketByteBufs.create()
         buf.writeVarInt(id)
         buf.writeUuid(getUuid())

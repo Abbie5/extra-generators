@@ -15,13 +15,13 @@ import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.particle.ParticleTypes
+import net.minecraft.registry.Registries
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.Identifier
 import net.minecraft.util.ItemScatterer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
 import team.reborn.energy.api.EnergyStorage
 import team.reborn.energy.api.EnergyStorageUtil
@@ -79,7 +79,7 @@ abstract class AbstractGeneratorBlockEntity<B: AbstractGeneratorBlockEntity<B>>(
     open fun initialize(block: AbstractGeneratorBlock): Boolean {
         (world?.getBlockState(pos)?.block as? AbstractGeneratorBlock)?.let {
             generatorConfig = it.generatorConfig
-            generatorIdentifier = Registry.BLOCK.getId(it)
+            generatorIdentifier = Registries.BLOCK.getId(it)
         }
         return generatorIdentifier != null && generatorConfig != null && ownerUUID != null
     }

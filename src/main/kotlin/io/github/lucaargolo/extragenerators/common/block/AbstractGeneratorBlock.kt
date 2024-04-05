@@ -31,7 +31,7 @@ abstract class AbstractGeneratorBlock(settings: Settings, val generatorConfig: M
     }
 
     override fun getPlacementState(ctx: ItemPlacementContext): BlockState? {
-        return defaultState.with(Properties.HORIZONTAL_FACING, ctx.playerFacing)
+        return defaultState.with(Properties.HORIZONTAL_FACING, ctx.horizontalPlayerFacing)
     }
 
     override fun hasSidedTransparency(state: BlockState?) = true

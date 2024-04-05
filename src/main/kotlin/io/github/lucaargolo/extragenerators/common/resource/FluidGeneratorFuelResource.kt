@@ -2,6 +2,7 @@
 
 package io.github.lucaargolo.extragenerators.common.resource
 
+import com.google.gson.JsonParser
 import io.github.lucaargolo.extragenerators.ExtraGenerators
 import io.github.lucaargolo.extragenerators.utils.FluidGeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
@@ -10,8 +11,8 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount
 import net.minecraft.fluid.Fluid
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.registry.Registries
 import net.minecraft.resource.ResourceManager
-import net.minecraft.util.registry.Registry
 import java.io.InputStreamReader
 
 class FluidGeneratorFuelResource: SimpleSynchronousResourceReloadListener {
@@ -33,7 +34,7 @@ class FluidGeneratorFuelResource: SimpleSynchronousResourceReloadListener {
             buf.writeString(id)
             buf.writeInt(fluidKeyMap.size)
             fluidKeyMap.forEach { (fluidKey, fuel) ->
-                buf.writeVarInt(Registry.FLUID.getRawId(fluidKey))
+                buf.writeVarInt(Registries.FLUID.getRawId(fluidKey))
                 fuel.toBuf(buf)
             }
         }
@@ -46,7 +47,7 @@ class FluidGeneratorFuelResource: SimpleSynchronousResourceReloadListener {
             val fluidKeysMapId = buf.readString()
             val fluidKeyMapSize = buf.readInt()
             repeat(fluidKeyMapSize) {
-                val fluidKey = Registry.FLUID.get(buf.readVarInt())
+                val fluidKey = Registries.FLUID.get(buf.readVarInt())
                 val fuel = FluidGeneratorFuel.fromBuf(buf) ?: FluidGeneratorFuel(0, ResourceAmount(FluidVariant.blank(), 0), 0.0)
                 clientFluidKeysMap.getOrPut(fluidKeysMapId) { linkedMapOf() } [fluidKey] = fuel
             }
@@ -63,7 +64,7 @@ class FluidGeneratorFuelResource: SimpleSynchronousResourceReloadListener {
             val resource = fluidsResource.value
             ExtraGenerators.LOGGER.info("Loading $id fluid generators resource at $fluidsResource.")
             try {
-                val json = ExtraGenerators.PARSER.parse(InputStreamReader(resource.inputStream, "UTF-8"))
+                val json = JsonParser.parseReader(InputStreamReader(resource.inputStream, "UTF-8"))
                 val jsonArray = json.asJsonArray
                 jsonArray.forEach { jsonElement ->
                     val jsonObject = jsonElement.asJsonObject

@@ -1,5 +1,6 @@
 package io.github.lucaargolo.extragenerators.common.resource
 
+import com.google.gson.JsonParser
 import io.github.lucaargolo.extragenerators.ExtraGenerators
 import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
@@ -59,7 +60,7 @@ class ItemGeneratorFuelResource: SimpleSynchronousResourceReloadListener {
             val resource = itemsResource.value
             ExtraGenerators.LOGGER.info("Loading $id item generators resource at $itemsResource.")
             try {
-                val json = ExtraGenerators.PARSER.parse(InputStreamReader(resource.inputStream, "UTF-8"))
+                val json = JsonParser.parseReader(InputStreamReader(resource.inputStream, "UTF-8"))
                 val jsonArray = json.asJsonArray
                 jsonArray.forEach { jsonElement ->
                     val jsonObject = jsonElement.asJsonObject

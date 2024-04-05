@@ -13,8 +13,8 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.potion.PotionUtil
 import net.minecraft.potion.Potions
+import net.minecraft.registry.Registries
 import net.minecraft.util.math.MathHelper
-import net.minecraft.util.registry.Registry
 import kotlin.math.*
 
 data class GeneratorFuel(val burnTime: Int, var currentBurnTime: Int, val energyOutput: Double) {
@@ -106,7 +106,7 @@ data class GeneratorFuel(val burnTime: Int, var currentBurnTime: Int, val energy
                 potion == Potions.EMPTY -> return null
                 listOf(Potions.WATER, Potions.MUNDANE, Potions.THICK, Potions.AWKWARD).contains(potion) -> 0
                 else -> {
-                    val potionPath = Registry.POTION.getId(potion).path
+                    val potionPath = Registries.POTION.getId(potion).path
                     when {
                         potionPath.startsWith("long") -> 2
                         potionPath.startsWith("strong") -> 2

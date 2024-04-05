@@ -5,9 +5,9 @@ import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilde
 import net.minecraft.entity.EntityDimensions
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
-import net.minecraft.util.registry.Registry
+import net.minecraft.registry.Registries
 
-object EntityCompendium: RegistryCompendium<EntityType<*>>(Registry.ENTITY_TYPE) {
+object EntityCompendium: RegistryCompendium<EntityType<*>>(Registries.ENTITY_TYPE) {
 
     val GENERATOR_AREA_EFFECT_CLOUD = register ("generator_area_effect_cloud", FabricEntityTypeBuilder.create(SpawnGroup.MISC) { type: EntityType<GeneratorAreaEffectCloudEntity>, world -> GeneratorAreaEffectCloudEntity(type, world) }.fireImmune().dimensions(EntityDimensions.changing(6.0F, 0.5F)).trackRangeBlocks(10).trackedUpdateRate(Integer.MAX_VALUE).build())
 
