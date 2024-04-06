@@ -2,7 +2,7 @@ package io.github.lucaargolo.extragenerators.utils
 
 import com.google.gson.JsonObject
 import io.github.lucaargolo.extragenerators.common.resource.ResourceCompendium
-import net.fabricmc.fabric.impl.content.registry.FuelRegistryImpl
+import net.fabricmc.fabric.api.registry.FuelRegistry
 import net.minecraft.enchantment.EnchantmentHelper
 import net.minecraft.entity.effect.StatusEffectCategory
 import net.minecraft.item.Item
@@ -60,7 +60,7 @@ data class ItemGeneratorFuel(override val burnTime: Int, var currentBurnTime: In
         }
 
         fun fromBurnableGeneratorFuel(item: Item): ItemGeneratorFuel? {
-            val burnTicks = FuelRegistryImpl.INSTANCE.get(item) ?: return null
+            val burnTicks = FuelRegistry.INSTANCE.get(item) ?: return null
             return ItemGeneratorFuel(round(burnTicks/4.0).toInt(), burnTicks*8.0)
         }
 
