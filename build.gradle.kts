@@ -91,7 +91,13 @@ dependencies {
         exclude(group = "net.fabricmc.fabric-api")
     }
 
-    modImplementation("me.shedaniel:RoughlyEnoughItems-fabric:${project["rei_version"]}")
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project["rei_version"]}")
+    modCompileOnly("me.shedaniel:RoughlyEnoughItems-default-plugin-fabric:${project["rei_version"]}")
+//    modLocalRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${project["rei_version"]}")
+
+    modCompileOnly("dev.emi:emi-fabric:${project["emi_version"]}:api")
+    modLocalRuntime("dev.emi:emi-fabric:${project["emi_version"]}")
+
     modRuntimeOnly("com.terraformersmc:modmenu:${project["modmenu_version"]}")
 }
 

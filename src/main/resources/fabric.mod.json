@@ -12,7 +12,6 @@
     "sources": "https://github.com/lucaargolo/extra-generators",
     "issues": "https://github.com/lucaargolo/extra-generators/issues"
   },
-
   "license": "Mozilla Public License 2.0",
   "icon": "assets/extragenerators/icon.png",
   "environment": "*",
@@ -25,7 +24,13 @@
     ],
     "rei_client": [
       {
-        "value": "io.github.lucaargolo.extragenerators.compat.ReiCompat",
+        "value": "io.github.lucaargolo.extragenerators.compat.rei.ReiCompat",
+        "adapter": "kotlin"
+      }
+    ],
+    "emi": [
+      {
+        "value": "io.github.lucaargolo.extragenerators.compat.emi.EmiCompat",
         "adapter": "kotlin"
       }
     ]

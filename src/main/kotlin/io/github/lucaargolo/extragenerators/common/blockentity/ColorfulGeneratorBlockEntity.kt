@@ -3,7 +3,7 @@
 package io.github.lucaargolo.extragenerators.common.blockentity
 
 import io.github.lucaargolo.extragenerators.ExtraGenerators
-import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.SimpleSidedInventory
 import io.github.lucaargolo.extragenerators.utils.fromNbt
 import io.github.lucaargolo.extragenerators.utils.toNbt
@@ -23,7 +23,7 @@ class ColorfulGeneratorBlockEntity(pos: BlockPos, state: BlockState): AbstractGe
         }
     }, { _, _ ->  false }, { intArrayOf(0, 1, 2) })
 
-    var burningFuel: GeneratorFuel? = null
+    var burningFuel: ItemGeneratorFuel? = null
 
     override fun isServerRunning() = burningFuel?.let { energyStorage.amount + MathHelper.floor(it.energyOutput/it.burnTime) <= energyStorage.getCapacity() } ?: false
 
@@ -67,11 +67,11 @@ class ColorfulGeneratorBlockEntity(pos: BlockPos, state: BlockState): AbstractGe
     override fun readNbt(tag: NbtCompound) {
         super.readNbt(tag)
         itemInv.fromNbt(tag.get("itemInv"))
-        burningFuel = GeneratorFuel.fromTag(tag.getCompound("burningFuel"))
+        burningFuel = ItemGeneratorFuel.fromTag(tag.getCompound("burningFuel"))
     }
 
     companion object {
-        fun getFuel() = GeneratorFuel(100, 3200.0)
+        fun getFuel() = ItemGeneratorFuel(100, 3200.0)
     }
 
 }

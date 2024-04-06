@@ -1,6 +1,6 @@
-package io.github.lucaargolo.extragenerators.compat
+package io.github.lucaargolo.extragenerators.compat.rei
 
-import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
 import me.shedaniel.math.Point
 import me.shedaniel.math.Rectangle
@@ -15,9 +15,7 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient
 import me.shedaniel.rei.api.common.util.EntryStacks
 import net.minecraft.block.Block
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.resource.language.I18n
 import net.minecraft.text.Text
-import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
 
 class ItemGeneratorCategory(private val id: String, private val block: Block): DisplayCategory<ItemGeneratorCategory.RecipeDisplay> {
@@ -59,9 +57,9 @@ class ItemGeneratorCategory(private val id: String, private val block: Block): D
 
     override fun getDisplayHeight() = 44
 
-    fun createDisplay(input: EntryIngredient, output: GeneratorFuel) = RecipeDisplay(categoryIdentifier, input, output)
+    fun createDisplay(input: EntryIngredient, output: ItemGeneratorFuel) = RecipeDisplay(categoryIdentifier, input, output)
 
-    class RecipeDisplay(private val category: CategoryIdentifier<RecipeDisplay>, val input: EntryIngredient, val output: GeneratorFuel): Display {
+    class RecipeDisplay(private val category: CategoryIdentifier<RecipeDisplay>, val input: EntryIngredient, val output: ItemGeneratorFuel): Display {
 
         override fun getInputEntries() = mutableListOf(input)
 

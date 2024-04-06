@@ -4,7 +4,7 @@ package io.github.lucaargolo.extragenerators.common.blockentity
 
 import io.github.lucaargolo.extragenerators.common.block.AbstractGeneratorBlock
 import io.github.lucaargolo.extragenerators.common.block.ItemGeneratorBlock
-import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.SimpleSidedInventory
 import io.github.lucaargolo.extragenerators.utils.fromNbt
 import io.github.lucaargolo.extragenerators.utils.toNbt
@@ -16,14 +16,14 @@ import net.minecraft.util.math.MathHelper
 
 class ItemGeneratorBlockEntity(pos: BlockPos, state: BlockState): AbstractGeneratorBlockEntity<ItemGeneratorBlockEntity>(BlockEntityCompendium.ITEM_GENERATOR_TYPE, pos, state) {
 
-    private var itemFuelMap: ((ItemStack) -> GeneratorFuel?)? = null
+    private var itemFuelMap: ((ItemStack) -> ItemGeneratorFuel?)? = null
     private var burnCallback: ((ItemGeneratorBlockEntity) -> Unit)? = null
 
     val itemInv = SimpleSidedInventory(1, { _, stack ->
         initialized && (stack.isEmpty || itemFuelMap?.invoke(stack) != null)
     }, { _, _ ->  false }, { intArrayOf(0) })
 
-    var burningFuel: GeneratorFuel? = null
+    var burningFuel: ItemGeneratorFuel? = null
 
     override fun isServerRunning() = burningFuel?.let { energyStorage.amount + MathHelper.floor(it.energyOutput/it.burnTime) <= energyStorage.getCapacity() } ?: false
 
@@ -73,7 +73,7 @@ class ItemGeneratorBlockEntity(pos: BlockPos, state: BlockState): AbstractGenera
     override fun readNbt(tag: NbtCompound) {
         super.readNbt(tag)
         itemInv.fromNbt(tag.get("itemInv"))
-        burningFuel = GeneratorFuel.fromTag(tag.getCompound("burningFuel"))
+        burningFuel = ItemGeneratorFuel.fromTag(tag.getCompound("burningFuel"))
     }
 
 }

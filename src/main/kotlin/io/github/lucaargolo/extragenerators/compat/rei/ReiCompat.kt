@@ -1,18 +1,19 @@
 @file:Suppress("unused", "DEPRECATION", "UnstableApiUsage")
 
-package io.github.lucaargolo.extragenerators.compat
+package io.github.lucaargolo.extragenerators.compat.rei
 
 import io.github.lucaargolo.extragenerators.ExtraGenerators
 import io.github.lucaargolo.extragenerators.common.block.BlockCompendium
 import io.github.lucaargolo.extragenerators.common.blockentity.ColorfulGeneratorBlockEntity
 import io.github.lucaargolo.extragenerators.common.resource.ResourceCompendium
 import io.github.lucaargolo.extragenerators.utils.FluidGeneratorFuel
-import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry
 import me.shedaniel.rei.api.common.util.EntryIngredients
 import me.shedaniel.rei.api.common.util.EntryStacks
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
 import net.minecraft.util.collection.DefaultedList
@@ -43,18 +44,17 @@ class ReiCompat: REIClientPlugin {
         ResourceCompendium.BLOCK_TEMPERATURE.clientTemperatureMap.forEach { (block, temperature) ->
             THERMOELECTRIC_GENERATOR.createDisplay(block, temperature).let { registry.add(it) }
         }
-        val items = DefaultedList.of<ItemStack>()
-        items.forEach {
-            GeneratorFuel.fromBurnableGeneratorFuel(it.item)?.run {
+        Registries.ITEM.map(Item::getDefaultStack).forEach {
+            ItemGeneratorFuel.fromBurnableGeneratorFuel(it.item)?.run {
                 BURNABLE_GENERATOR.createDisplay(EntryIngredients.of(it.item), this)
             }?.let { display -> registry.add(display) }
-            GeneratorFuel.fromGluttonyGeneratorFuel(it.item)?.run {
+            ItemGeneratorFuel.fromGluttonyGeneratorFuel(it.item)?.run {
                 GLUTTONY_GENERATOR.createDisplay(EntryIngredients.of(it.item), this)
             }?.let { display -> registry.add(display) }
-            GeneratorFuel.fromEnchantedGeneratorFuel(it)?.run {
+            ItemGeneratorFuel.fromEnchantedGeneratorFuel(it)?.run {
                 ENCHANTED_GENERATOR.createDisplay(EntryIngredients.of(it), this)
             }?.let { display -> registry.add(display) }
-            GeneratorFuel.fromBrewGeneratorFuel(it)?.run {
+            ItemGeneratorFuel.fromBrewGeneratorFuel(it)?.run {
                 BREW_GENERATOR.createDisplay(EntryIngredients.of(it), this)
             }?.let { display -> registry.add(display) }
             FluidGeneratorFuel.fromRedstoneGeneratorFuel(it)?.run {

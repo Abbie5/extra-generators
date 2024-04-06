@@ -1,6 +1,6 @@
-package io.github.lucaargolo.extragenerators.compat
+package io.github.lucaargolo.extragenerators.compat.rei
 
-import io.github.lucaargolo.extragenerators.utils.FluidGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
 import me.shedaniel.math.Point
 import me.shedaniel.math.Rectangle
@@ -12,14 +12,15 @@ import me.shedaniel.rei.api.client.registry.display.DisplayCategory
 import me.shedaniel.rei.api.common.category.CategoryIdentifier
 import me.shedaniel.rei.api.common.display.Display
 import me.shedaniel.rei.api.common.entry.EntryIngredient
+import me.shedaniel.rei.api.common.entry.EntryStack
 import me.shedaniel.rei.api.common.util.EntryStacks
 import net.minecraft.block.Block
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.resource.language.I18n
+import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
 import net.minecraft.util.math.MathHelper
 
-class FluidGeneratorCategory(private val id: String, private val block: Block): DisplayCategory<FluidGeneratorCategory.RecipeDisplay> {
+class ColorfulGeneratorCategory(private val id: String, private val block: Block): DisplayCategory<ColorfulGeneratorCategory.RecipeDisplay> {
 
     init { set.add(this) }
 
@@ -39,7 +40,10 @@ class FluidGeneratorCategory(private val id: String, private val block: Block): 
         widgets.add(Widgets.createDrawableWidget { c, _, _, _ -> c.matrices.scale(0.5f, 0.5f, 1f)})
 
         widgets.add(Widgets.createBurningFire(Point(bounds.x+44, bounds.y+4)).animationDurationTicks(display.output.burnTime.toDouble()))
-        widgets.add(Widgets.createSlot(Point(bounds.x+44, bounds.y+22)).entries(display.input))
+        widgets.add(Widgets.createSlot(Point(bounds.x+44, bounds.y+22)).entries(display.redInput))
+        widgets.add(Widgets.createSlot(Point(bounds.x+62, bounds.y+22)).entries(display.greenInput))
+        widgets.add(Widgets.createSlot(Point(bounds.x+80, bounds.y+22)).entries(display.blueInput))
+
         widgets.add(Widgets.createLabel(Point(bounds.x+67, bounds.y+8), Text.translatable("screen.extragenerators.rei.energy_output")).leftAligned())
         widgets.add(Widgets.createLabel(Point(bounds.x+145, bounds.y+26), Text.of("${display.output.energyOutput} E")).rightAligned())
 
@@ -58,20 +62,24 @@ class FluidGeneratorCategory(private val id: String, private val block: Block): 
 
     override fun getDisplayHeight() = 44
 
-    fun createDisplay(input: EntryIngredient, output: FluidGeneratorFuel) = RecipeDisplay(categoryIdentifier, input, output)
+    fun createDisplay(redInput: List<EntryStack<ItemStack>>, greenInput: List<EntryStack<ItemStack>>, blueInput: List<EntryStack<ItemStack>>, output: ItemGeneratorFuel) = RecipeDisplay(categoryIdentifier, redInput, greenInput, blueInput, output)
 
-    class RecipeDisplay(private val category: CategoryIdentifier<RecipeDisplay>, val input: EntryIngredient, val output: FluidGeneratorFuel): Display {
+    class RecipeDisplay(private val category: CategoryIdentifier<RecipeDisplay>, val redInput: List<EntryStack<ItemStack>>, val greenInput: List<EntryStack<ItemStack>>, val blueInput: List<EntryStack<ItemStack>>, val output: ItemGeneratorFuel): Display {
 
-        override fun getInputEntries() = mutableListOf(input)
+        override fun getInputEntries() = mutableListOf<EntryIngredient>().also {
+            it.add(EntryIngredient.of(redInput))
+            it.add(EntryIngredient.of(greenInput))
+            it.add(EntryIngredient.of(blueInput))
+        }
 
         override fun getOutputEntries() = mutableListOf<EntryIngredient>()
 
-        override fun getCategoryIdentifier() = category
+        override fun getCategoryIdentifier(): CategoryIdentifier<*> = category
 
     }
 
     companion object {
-        private val set = linkedSetOf<FluidGeneratorCategory>()
+        private val set = linkedSetOf<ColorfulGeneratorCategory>()
 
         fun getMatching(id: String) = set.firstOrNull { id == it.identifier.toString().split(":")[1].replace("_generator", "") }
 
@@ -81,6 +89,5 @@ class FluidGeneratorCategory(private val id: String, private val block: Block): 
             registry.removePlusButton(it.categoryIdentifier)
         }
     }
-
 
 }

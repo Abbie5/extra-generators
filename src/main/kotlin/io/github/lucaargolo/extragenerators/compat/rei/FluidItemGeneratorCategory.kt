@@ -1,4 +1,4 @@
-package io.github.lucaargolo.extragenerators.compat
+package io.github.lucaargolo.extragenerators.compat.rei
 
 import io.github.lucaargolo.extragenerators.utils.FluidGeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier

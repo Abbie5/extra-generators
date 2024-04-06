@@ -6,7 +6,7 @@ import io.github.lucaargolo.extragenerators.common.blockentity.AbstractGenerator
 import io.github.lucaargolo.extragenerators.common.blockentity.BlockEntityCompendium
 import io.github.lucaargolo.extragenerators.common.blockentity.ItemGeneratorBlockEntity
 import io.github.lucaargolo.extragenerators.common.containers.ItemGeneratorScreenHandler
-import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModConfig
 import io.github.lucaargolo.extragenerators.utils.SimpleSidedInventory
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
@@ -32,7 +32,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraft.world.WorldAccess
 
-class ItemGeneratorBlock(settings: Settings, generatorConfig: ModConfig.Generator, val itemFuelMap: (ItemStack) -> GeneratorFuel?, val burnCallback: (ItemGeneratorBlockEntity) -> Unit = {  }): AbstractGeneratorBlock(settings, generatorConfig), InventoryProvider {
+class ItemGeneratorBlock(settings: Settings, generatorConfig: ModConfig.Generator, val itemFuelMap: (ItemStack) -> ItemGeneratorFuel?, val burnCallback: (ItemGeneratorBlockEntity) -> Unit = {  }): AbstractGeneratorBlock(settings, generatorConfig), InventoryProvider {
 
     override fun getInventory(state: BlockState?, world: WorldAccess?, pos: BlockPos?): SidedInventory {
         return (world?.getBlockEntity(pos) as? ItemGeneratorBlockEntity)?.itemInv ?: SimpleSidedInventory(0, { _, _ -> false }, { _, _ -> false }, { intArrayOf(0) })

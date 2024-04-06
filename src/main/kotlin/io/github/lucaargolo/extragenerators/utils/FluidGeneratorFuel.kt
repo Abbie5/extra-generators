@@ -4,9 +4,9 @@ package io.github.lucaargolo.extragenerators.utils
 
 import com.google.gson.JsonObject
 import io.github.lucaargolo.extragenerators.common.resource.ResourceCompendium
+import net.fabricmc.fabric.api.registry.FuelRegistry
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ResourceAmount
-import net.fabricmc.fabric.impl.content.registry.FuelRegistryImpl
 import net.minecraft.fluid.Fluid
 import net.minecraft.fluid.Fluids
 import net.minecraft.item.ItemStack
@@ -15,7 +15,7 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.PacketByteBuf
 import kotlin.math.round
 
-data class FluidGeneratorFuel(val burnTime: Int, var currentBurnTime: Int, val fluidInput: ResourceAmount<FluidVariant>, val energyOutput: Double) {
+data class FluidGeneratorFuel(override val burnTime: Int, var currentBurnTime: Int, val fluidInput: ResourceAmount<FluidVariant>, override val energyOutput: Double) : GeneratorFuel {
 
     constructor(burnTime: Int, fluidInput: ResourceAmount<FluidVariant>, energyOutput: Double): this(burnTime, burnTime, fluidInput, energyOutput)
 
@@ -63,7 +63,7 @@ data class FluidGeneratorFuel(val burnTime: Int, var currentBurnTime: Int, val f
         }
 
         fun fromSteamGeneratorFuel(itemStack: ItemStack): FluidGeneratorFuel? {
-            val burnTicks = FuelRegistryImpl.INSTANCE.get(itemStack.item) ?: return null
+            val burnTicks = FuelRegistry.INSTANCE.get(itemStack.item) ?: return null
             return FluidGeneratorFuel(round(burnTicks/4.0).toInt(), ResourceAmount(FluidVariant.of(Fluids.WATER), burnTicks.toLong()*81), burnTicks*16.0)
         }
 
