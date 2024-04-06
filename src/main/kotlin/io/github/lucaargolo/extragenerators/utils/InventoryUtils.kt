@@ -19,8 +19,6 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.*
-import net.minecraft.client.texture.SpriteAtlasTexture
-import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.fluid.Fluids
 import net.minecraft.inventory.SidedInventory
@@ -31,6 +29,7 @@ import net.minecraft.nbt.NbtElement
 import net.minecraft.nbt.NbtList
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.registry.Registries
+import net.minecraft.screen.PlayerScreenHandler
 import net.minecraft.screen.slot.Slot
 import net.minecraft.text.Text
 import net.minecraft.util.ActionResult
@@ -259,12 +258,11 @@ fun FluidVariant.renderGuiRect(context: DrawContext, startX: Float, startY: Floa
 
 /*
     Original code from Modern Industrialization
-    Available at: https://github.com/AztechMC/Modern-Industrialization/blob/bb0fa25698f0692ad9c1a3a104544be886856b7a/src/main/java/aztech/modern_industrialization/util/RenderHelper.java#L152
+    Available at: https://github.com/AztechMC/Modern-Industrialization/blob/597583287079b554bce7f72e71466a15de22edb6/src/client/java/aztech/modern_industrialization/util/RenderHelper.java#L195
     Thanks Technici4n :3
 */
 private fun FluidVariant.innerRenderGuiRect(context: DrawContext, i: Float, j: Float, scale: Int, fractionUp: Float) {
-    val ms = context.matrices
-    RenderSystem.setShaderTexture(0, SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)
+    RenderSystem.setShaderTexture(0, PlayerScreenHandler.BLOCK_ATLAS_TEXTURE)
     val sprite = FluidVariantRendering.getSprite(this)
     val color = FluidVariantRendering.getColor(this)
     if (sprite == null) return
@@ -273,6 +271,8 @@ private fun FluidVariant.innerRenderGuiRect(context: DrawContext, i: Float, j: F
     val g = (color shr 8 and 255) / 256f
     val b = (color and 255) / 256f
     RenderSystem.disableDepthTest()
+
+    RenderSystem.setShader { GameRenderer.getPositionColorTexProgram() }
     val bufferBuilder = Tessellator.getInstance().buffer
     bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE)
     val x1 = i + scale
@@ -282,11 +282,13 @@ private fun FluidVariant.innerRenderGuiRect(context: DrawContext, i: Float, j: F
     val v1 = sprite.maxV
     val v0 = v1 + (sprite.minV - v1) * fractionUp
     val u1 = sprite.maxU
-    val model = ms.peek().positionMatrix
+
+    val model = context.matrices.peek().positionMatrix
     bufferBuilder.vertex(model, i, y1, z).color(r, g, b, a).texture(u0, v1).next()
     bufferBuilder.vertex(model, x1, y1, z).color(r, g, b, a).texture(u1, v1).next()
     bufferBuilder.vertex(model, x1, j, z).color(r, g, b, a).texture(u1, v0).next()
     bufferBuilder.vertex(model, i, j, z).color(r, g, b, a).texture(u0, v0).next()
-    BufferRenderer.draw(bufferBuilder.end())
+    BufferRenderer.drawWithGlobalProgram(bufferBuilder.end())
+
     RenderSystem.enableDepthTest()
 }
