@@ -33,19 +33,25 @@
   "screen.extragenerators.rei.burn_rate": "Burn rate: %s E/Tick",
   "screen.extragenerators.rei.energy_output": "Energy Output:",
 
-  "tag.item.extragenerators.red_items": "Red Items",
-  "tag.item.extragenerators.green_items": "Green Items",
   "tag.item.extragenerators.blue_items": "Blue Items",
+  "tag.item.extragenerators.green_items": "Green Items",
+  "tag.item.extragenerators.red_items": "Red Items",
 
   "tag.item.c.buttons_that_burn": "Burnable Buttons",
   "tag.item.c.doors_that_burn": "Burnable Doors",
+  "tag.item.c.dye_blue": "Blue Dyes",
+  "tag.item.c.dye_green": "Blue Dyes",
+  "tag.item.c.dye_red": "Blue Dyes",
   "tag.item.c.fence_gates_that_burn": "Burnable Fence Gates",
   "tag.item.c.fences_that_burn": "Burnable Fences",
   "tag.item.c.hanging_signs_that_burn": "Burnable Hanging Signs",
+  "tag.item.c.netherite_blocks": "Netherite Blocks",
   "tag.item.c.planks_that_burn": "Burnable Planks",
   "tag.item.c.pressure_plates_that_burn": "Burnable Pressure Plates",
+  "tag.item.c.redstone_blocks": "Redstone Blocks",
   "tag.item.c.signs_that_burn": "Burnable Signs",
   "tag.item.c.slabs_that_burn": "Burnable Slabs",
+  "tag.item.c.slime_blocks": "Slime Blocks",
   "tag.item.c.stairs_that_burn": "Burnable Stairs",
   "tag.item.c.trapdoors_that_burn": "Burnable Trapdoors"
 }
