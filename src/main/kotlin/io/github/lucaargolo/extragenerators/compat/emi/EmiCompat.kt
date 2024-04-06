@@ -13,6 +13,7 @@ import io.github.lucaargolo.extragenerators.utils.FluidGeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
 import net.minecraft.enchantment.EnchantmentLevelEntry
 import net.minecraft.item.EnchantedBookItem
+import net.minecraft.item.Item
 import net.minecraft.registry.Registries
 
 class EmiCompat : EmiPlugin {
@@ -94,86 +95,45 @@ class EmiCompat : EmiPlugin {
         }
 
         Registries.ITEM.forEach {
-//            ItemGeneratorFuel.fromBurnableGeneratorFuel(it)?.run {
-//                ItemGeneratorEmiRecipe(ExtraGeneratorsCategories.BURNABLE_GENERATOR, "", EmiStack.of(it), this)
-//            }?.let(registry::addRecipe)
-//            ItemGeneratorFuel.fromGluttonyGeneratorFuel(it)?.run {
-//                ItemGeneratorEmiRecipe(ExtraGeneratorsCategories.GLUTTONY_GENERATOR, EmiStack.of(it), this)
-//            }?.let(registry::addRecipe)
-//            ItemGeneratorFuel.fromEnchantedGeneratorFuel(it.defaultStack)?.run {
-//                ItemGeneratorEmiRecipe(ExtraGeneratorsCategories.ENCHANTED_GENERATOR, EmiStack.of(it), this)
-//            }?.let(registry::addRecipe)
             ItemGeneratorFuel.fromBrewGeneratorFuel(it.defaultStack)?.run {
                 ItemGeneratorEmiRecipe(ExtraGeneratorsCategories.BREW_GENERATOR, EmiStack.of(it), this)
             }?.let(registry::addRecipe)
             FluidGeneratorFuel.fromRedstoneGeneratorFuel(it.defaultStack)?.run {
                 FluidItemGeneratorEmiRecipe(ExtraGeneratorsCategories.REDSTONE_GENERATOR, EmiStack.of(it), FabricEmiStack.of(fluidInput.resource, fluidInput.amount), this)
             }?.let(registry::addRecipe)
-//            FluidGeneratorFuel.fromSteamGeneratorFuel(it.defaultStack)?.run {
-//                FluidItemGeneratorEmiRecipe(ExtraGeneratorsCategories.STEAM_GENERATOR, EmiStack.of(it), FabricEmiStack.of(fluidInput.resource, fluidInput.amount), this)
-//            }?.let(registry::addRecipe)
         }
 
-        val burnable = mutableMapOf<ItemGeneratorFuel, MutableList<EmiStack>>()
-        Registries.ITEM.forEach {
-            ItemGeneratorFuel.fromBurnableGeneratorFuel(it)?.run {
-                val list = burnable[this]
-                val stack = EmiStack.of(it)
-                if (list == null) {
-                    burnable[this] = arrayListOf(stack)
-                } else {
-                    list.add(stack)
-                }
-            }
-        }
-        burnable.forEach {
-            registry.addRecipe(ItemGeneratorEmiRecipe(
+        Registries.ITEM
+            .filter { ItemGeneratorFuel.fromBurnableGeneratorFuel(it) != null }
+            .groupBy(ItemGeneratorFuel::fromBurnableGeneratorFuel)
+            .mapValues { EmiIngredient.of(it.value.map(EmiStack::of)) }
+            .map { it.key?.let { fuel -> ItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.BURNABLE_GENERATOR,
-                EmiIngredient.of(it.value),
-                it.key
-            ))
-        }
+                it.value,
+                fuel
+            ) } }.forEach(registry::addRecipe)
 
-        val steam = mutableMapOf<FluidGeneratorFuel, MutableList<EmiStack>>()
-        Registries.ITEM.forEach {
-            FluidGeneratorFuel.fromSteamGeneratorFuel(it.defaultStack)?.run {
-                val list = steam[this]
-                val stack = EmiStack.of(it)
-                if (list == null) {
-                    steam[this] = arrayListOf(stack)
-                } else {
-                    list.add(stack)
-                }
-            }
-        }
-        steam.forEach {
-            registry.addRecipe(FluidItemGeneratorEmiRecipe(
+        Registries.ITEM
+            .map(Item::getDefaultStack)
+            .filter { FluidGeneratorFuel.fromSteamGeneratorFuel(it) != null }
+            .groupBy(FluidGeneratorFuel::fromSteamGeneratorFuel)
+            .mapValues { EmiIngredient.of(it.value.map(EmiStack::of)) }
+            .map { it.key?.let { fuel -> FluidItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.STEAM_GENERATOR,
-                EmiIngredient.of(it.value),
-                FabricEmiStack.of(it.key.fluidInput.resource, it.key.fluidInput.amount),
-                it.key
-            ))
-        }
+                it.value,
+                FabricEmiStack.of(fuel.fluidInput.resource, fuel.fluidInput.amount),
+                fuel
+            ) } }.forEach(registry::addRecipe)
 
-        val gluttony = mutableMapOf<ItemGeneratorFuel, MutableList<EmiStack>>()
-        Registries.ITEM.forEach {
-            ItemGeneratorFuel.fromGluttonyGeneratorFuel(it)?.run {
-                val list = gluttony[this]
-                val stack = EmiStack.of(it)
-                if (list == null) {
-                    gluttony[this] = arrayListOf(stack)
-                } else {
-                    list.add(stack)
-                }
-            }
-        }
-        gluttony.forEach {
-            registry.addRecipe(ItemGeneratorEmiRecipe(
+        Registries.ITEM
+            .filter { ItemGeneratorFuel.fromGluttonyGeneratorFuel(it) != null }
+            .groupBy(ItemGeneratorFuel::fromGluttonyGeneratorFuel)
+            .mapValues { EmiIngredient.of(it.value.map(EmiStack::of)) }
+            .map { it.key?.let { fuel -> ItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.GLUTTONY_GENERATOR,
-                EmiIngredient.of(it.value),
-                it.key
-            ))
-        }
+                it.value,
+                fuel
+            ) } }.forEach(registry::addRecipe)
 
         Registries.ENCHANTMENT.forEach {
             for (level: Int in it.minLevel..it.maxLevel) {
@@ -188,6 +148,11 @@ class EmiCompat : EmiPlugin {
             }
         }
 
-        registry.addRecipe(ColorfulGeneratorEmiRecipe(EmiIngredient.of(ExtraGenerators.RED_ITEMS), EmiIngredient.of(ExtraGenerators.GREEN_ITEMS), EmiIngredient.of(ExtraGenerators.BLUE_ITEMS), ColorfulGeneratorBlockEntity.getFuel()))
+        registry.addRecipe(ColorfulGeneratorEmiRecipe(
+            EmiIngredient.of(ExtraGenerators.RED_ITEMS),
+            EmiIngredient.of(ExtraGenerators.GREEN_ITEMS),
+            EmiIngredient.of(ExtraGenerators.BLUE_ITEMS),
+            ColorfulGeneratorBlockEntity.getFuel()
+        ))
     }
 }
