@@ -4,6 +4,7 @@
   "package": "io.github.lucaargolo.extragenerators.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "FluidBlockAccessor",
     "ItemStackInvoker"
   ],
   "client": [

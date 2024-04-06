@@ -3,19 +3,28 @@ package io.github.lucaargolo.extragenerators.compat.emi.recipe
 import dev.emi.emi.api.recipe.BasicEmiRecipe
 import dev.emi.emi.api.recipe.EmiRecipeCategory
 import dev.emi.emi.api.stack.EmiIngredient
+import dev.emi.emi.api.stack.EmiStack
 import dev.emi.emi.api.widget.WidgetHolder
+import io.github.lucaargolo.extragenerators.compat.emi.stack.FireEmiStack
+import io.github.lucaargolo.extragenerators.mixin.FluidBlockAccessor
+import net.minecraft.block.AbstractFireBlock
+import net.minecraft.block.Block
+import net.minecraft.block.FluidBlock
 import net.minecraft.text.Text
-import net.minecraft.text.TextColor
 import net.minecraft.util.math.MathHelper
-import java.awt.Color
 
 class ThermoelectricGeneratorEmiRecipe(
     category: EmiRecipeCategory,
-    private val input: EmiIngredient,
+    block: Block,
     private val temperature: Int
 ) : BasicEmiRecipe(
     category, null, 80, 18
 ) {
+    private val input: EmiIngredient = when (block) {
+        is FluidBlock -> EmiStack.of((block as FluidBlockAccessor).fluid)
+        is AbstractFireBlock -> FireEmiStack.of(block)
+        else -> EmiStack.of(block)
+    }
 
     init {
         inputs = listOf(input)
@@ -37,8 +46,8 @@ class ThermoelectricGeneratorEmiRecipe(
         val green = MathHelper.lerp(delta, baseColor.second, finalColor.second)
         val blue = MathHelper.lerp(delta, baseColor.third, finalColor.third)
 
-        val textColor = TextColor.fromRgb(Color(red, green, blue).rgb)
+        val textColor = ((red * 255 + 0.5).toInt() shl 16) or ((green * 255 + 0.5).toInt() shl 8) or ((blue * 255 + 0.5).toInt() shl 0)
 
-        widgets.addText(Text.literal("$temperature °C").styled { it.withColor(textColor) }, 20, 4, -1,true)
+        widgets.addText(Text.literal("$temperature °C"), 20, 4, textColor,true)
     }
 }

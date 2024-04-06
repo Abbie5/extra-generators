@@ -14,6 +14,8 @@ import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
 import net.minecraft.enchantment.EnchantmentLevelEntry
 import net.minecraft.item.EnchantedBookItem
 import net.minecraft.item.Item
+import net.minecraft.item.Items
+import net.minecraft.potion.PotionUtil
 import net.minecraft.registry.Registries
 
 class EmiCompat : EmiPlugin {
@@ -91,17 +93,26 @@ class EmiCompat : EmiPlugin {
             }
         }
         ResourceCompendium.BLOCK_TEMPERATURE.clientTemperatureMap.forEach { (block, temperature) ->
-            registry.addRecipe(ThermoelectricGeneratorEmiRecipe(ExtraGeneratorsCategories.THERMOELECTRIC_GENERATOR, EmiStack.of(block), temperature))
+            registry.addRecipe(ThermoelectricGeneratorEmiRecipe(ExtraGeneratorsCategories.THERMOELECTRIC_GENERATOR, block, temperature))
         }
 
         Registries.ITEM.forEach {
-            ItemGeneratorFuel.fromBrewGeneratorFuel(it.defaultStack)?.run {
-                ItemGeneratorEmiRecipe(ExtraGeneratorsCategories.BREW_GENERATOR, EmiStack.of(it), this)
-            }?.let(registry::addRecipe)
             FluidGeneratorFuel.fromRedstoneGeneratorFuel(it.defaultStack)?.run {
                 FluidItemGeneratorEmiRecipe(ExtraGeneratorsCategories.REDSTONE_GENERATOR, EmiStack.of(it), FabricEmiStack.of(fluidInput.resource, fluidInput.amount), this)
             }?.let(registry::addRecipe)
         }
+
+        Registries.POTION
+            .flatMap {
+                listOf(Items.POTION, Items.SPLASH_POTION, Items.TIPPED_ARROW, Items.LINGERING_POTION)
+                    .map { it.defaultStack }
+                    .map { stack -> PotionUtil.setPotion(stack, it) }
+            }.associateWith { ItemGeneratorFuel.fromBrewGeneratorFuel(it) }
+            .mapNotNull { it.value?.let { value -> it.key to value } }
+            .toMap()
+            .mapKeys { EmiStack.of(it.key) }
+            .map { ItemGeneratorEmiRecipe(ExtraGeneratorsCategories.BREW_GENERATOR, it.key, it.value) }
+            .forEach { registry.addRecipe(it) }
 
         Registries.ITEM
             .filter { ItemGeneratorFuel.fromBurnableGeneratorFuel(it) != null }
@@ -135,18 +146,18 @@ class EmiCompat : EmiPlugin {
                 fuel
             ) } }.forEach(registry::addRecipe)
 
-        Registries.ENCHANTMENT.forEach {
-            for (level: Int in it.minLevel..it.maxLevel) {
-                val bookItemStack = EnchantedBookItem.forEnchantment(EnchantmentLevelEntry(it, level))
-                ItemGeneratorFuel.fromEnchantedGeneratorFuel(bookItemStack)?.run {
-                    ItemGeneratorEmiRecipe(
-                        ExtraGeneratorsCategories.ENCHANTED_GENERATOR,
-                        EmiStack.of(bookItemStack),
-                        this
-                    )
-                }?.let(registry::addRecipe)
-            }
-        }
+        Registries.ENCHANTMENT
+            .flatMap { (it.minLevel..it.maxLevel).map {
+                level -> EnchantedBookItem.forEnchantment(EnchantmentLevelEntry(it, level))
+            } }.associateWith(ItemGeneratorFuel::fromEnchantedGeneratorFuel)
+            .mapNotNull { it.value?.let { value -> it.key to value } }
+            .toMap()
+            .mapKeys { EmiStack.of(it.key) }
+            .map { ItemGeneratorEmiRecipe(
+                ExtraGeneratorsCategories.ENCHANTED_GENERATOR,
+                it.key,
+                it.value
+            ) }.forEach(registry::addRecipe)
 
         registry.addRecipe(ColorfulGeneratorEmiRecipe(
             EmiIngredient.of(ExtraGenerators.RED_ITEMS),

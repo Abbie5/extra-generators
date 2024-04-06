@@ -35,9 +35,6 @@ abstract class AbstractExtraGeneratorsEmiRecipe(
                 EmiTooltipComponents.of(Text.translatable("screen.extragenerators.rei.burn_rate", MathHelper.floor(fuel.energyOutput/fuel.burnTime)))
             ))
 
-//        widgets.addText(Text.translatable("screen.extragenerators.rei.energy_output"), 20, 0, -1, true)
-//        widgets.addText(Text.literal("${fuel.energyOutput} E"), 100, 10, -1, true)
-//            .horizontalAlign(TextWidget.Alignment.END)
         val energyHeight = (fuel.energyOutput * 52 / generatorCategory.block.generatorConfig.storage).toInt().coerceIn(1, 52)
         val energyV = 52 - energyHeight
         val energyY = 1 + energyV
