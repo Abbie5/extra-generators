@@ -80,7 +80,6 @@ class EmiCompat : EmiPlugin {
             }
         }
         ResourceCompendium.FLUID_GENERATORS.clientFluidKeysMap.forEach { (id, fluidKeyMap) ->
-            println(id)
             val category = fluidGeneratorMap[id] ?: return@forEach
             fluidKeyMap.forEach { (fluidKey, fuel) ->
                 registry.addRecipe(
@@ -96,67 +95,70 @@ class EmiCompat : EmiPlugin {
             registry.addRecipe(ThermoelectricGeneratorEmiRecipe(ExtraGeneratorsCategories.THERMOELECTRIC_GENERATOR, block, temperature))
         }
 
-        Registries.ITEM.forEach {
-            FluidGeneratorFuel.fromRedstoneGeneratorFuel(it.defaultStack)?.run {
-                FluidItemGeneratorEmiRecipe(ExtraGeneratorsCategories.REDSTONE_GENERATOR, EmiStack.of(it), FabricEmiStack.of(fluidInput.resource, fluidInput.amount), this)
-            }?.let(registry::addRecipe)
-        }
+        Registries.ITEM
+            .map(Item::getDefaultStack)
+            .filter { FluidGeneratorFuel.fromRedstoneGeneratorFuel(it) != null }
+            .associateWith(FluidGeneratorFuel::fromRedstoneGeneratorFuel)
+            .mapKeys { EmiStack.of(it.key) }
+            .map { FluidItemGeneratorEmiRecipe(
+                ExtraGeneratorsCategories.REDSTONE_GENERATOR,
+                it.key,
+                FabricEmiStack.of(it.value!!.fluidInput.resource, it.value!!.fluidInput.amount),
+                it.value!!
+            ) }.forEach(registry::addRecipe)
 
         Registries.POTION
             .flatMap {
                 listOf(Items.POTION, Items.SPLASH_POTION, Items.TIPPED_ARROW, Items.LINGERING_POTION)
-                    .map { it.defaultStack }
+                    .map(Item::getDefaultStack)
                     .map { stack -> PotionUtil.setPotion(stack, it) }
-            }.associateWith { ItemGeneratorFuel.fromBrewGeneratorFuel(it) }
-            .mapNotNull { it.value?.let { value -> it.key to value } }
-            .toMap()
+            }.associateWith(ItemGeneratorFuel::fromBrewGeneratorFuel)
+            .filter { it.value != null }
             .mapKeys { EmiStack.of(it.key) }
-            .map { ItemGeneratorEmiRecipe(ExtraGeneratorsCategories.BREW_GENERATOR, it.key, it.value) }
-            .forEach { registry.addRecipe(it) }
+            .map { ItemGeneratorEmiRecipe(ExtraGeneratorsCategories.BREW_GENERATOR, it.key, it.value!!) }
+            .forEach(registry::addRecipe)
 
         Registries.ITEM
             .filter { ItemGeneratorFuel.fromBurnableGeneratorFuel(it) != null }
             .groupBy(ItemGeneratorFuel::fromBurnableGeneratorFuel)
             .mapValues { EmiIngredient.of(it.value.map(EmiStack::of)) }
-            .map { it.key?.let { fuel -> ItemGeneratorEmiRecipe(
+            .map { ItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.BURNABLE_GENERATOR,
                 it.value,
-                fuel
-            ) } }.forEach(registry::addRecipe)
+                it.key!!
+            ) }.forEach(registry::addRecipe)
 
         Registries.ITEM
             .map(Item::getDefaultStack)
             .filter { FluidGeneratorFuel.fromSteamGeneratorFuel(it) != null }
             .groupBy(FluidGeneratorFuel::fromSteamGeneratorFuel)
             .mapValues { EmiIngredient.of(it.value.map(EmiStack::of)) }
-            .map { it.key?.let { fuel -> FluidItemGeneratorEmiRecipe(
+            .map { FluidItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.STEAM_GENERATOR,
                 it.value,
-                FabricEmiStack.of(fuel.fluidInput.resource, fuel.fluidInput.amount),
-                fuel
-            ) } }.forEach(registry::addRecipe)
+                FabricEmiStack.of(it.key!!.fluidInput.resource, it.key!!.fluidInput.amount),
+                it.key!!
+            ) }.forEach(registry::addRecipe)
 
         Registries.ITEM
             .filter { ItemGeneratorFuel.fromGluttonyGeneratorFuel(it) != null }
             .groupBy(ItemGeneratorFuel::fromGluttonyGeneratorFuel)
             .mapValues { EmiIngredient.of(it.value.map(EmiStack::of)) }
-            .map { it.key?.let { fuel -> ItemGeneratorEmiRecipe(
+            .map { ItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.GLUTTONY_GENERATOR,
                 it.value,
-                fuel
-            ) } }.forEach(registry::addRecipe)
+                it.key!!
+            ) }.forEach(registry::addRecipe)
 
         Registries.ENCHANTMENT
             .flatMap { (it.minLevel..it.maxLevel).map {
                 level -> EnchantedBookItem.forEnchantment(EnchantmentLevelEntry(it, level))
             } }.associateWith(ItemGeneratorFuel::fromEnchantedGeneratorFuel)
-            .mapNotNull { it.value?.let { value -> it.key to value } }
-            .toMap()
             .mapKeys { EmiStack.of(it.key) }
             .map { ItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.ENCHANTED_GENERATOR,
                 it.key,
-                it.value
+                it.value!!
             ) }.forEach(registry::addRecipe)
 
         registry.addRecipe(ColorfulGeneratorEmiRecipe(
