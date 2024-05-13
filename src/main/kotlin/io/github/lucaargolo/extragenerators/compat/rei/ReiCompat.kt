@@ -7,16 +7,14 @@ import io.github.lucaargolo.extragenerators.common.block.BlockCompendium
 import io.github.lucaargolo.extragenerators.common.blockentity.ColorfulGeneratorBlockEntity
 import io.github.lucaargolo.extragenerators.common.resource.ResourceCompendium
 import io.github.lucaargolo.extragenerators.utils.FluidGeneratorFuel
-import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry
 import me.shedaniel.rei.api.common.util.EntryIngredients
 import me.shedaniel.rei.api.common.util.EntryStacks
 import net.minecraft.item.Item
-import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
-import net.minecraft.util.collection.DefaultedList
 
 class ReiCompat: REIClientPlugin {
 
@@ -45,16 +43,16 @@ class ReiCompat: REIClientPlugin {
             THERMOELECTRIC_GENERATOR.createDisplay(block, temperature).let { registry.add(it) }
         }
         Registries.ITEM.map(Item::getDefaultStack).forEach {
-            ItemGeneratorFuel.fromBurnableGeneratorFuel(it.item)?.run {
+            GeneratorFuel.fromBurnableGeneratorFuel(it.item)?.run {
                 BURNABLE_GENERATOR.createDisplay(EntryIngredients.of(it.item), this)
             }?.let { display -> registry.add(display) }
-            ItemGeneratorFuel.fromGluttonyGeneratorFuel(it.item)?.run {
+            GeneratorFuel.fromGluttonyGeneratorFuel(it.item)?.run {
                 GLUTTONY_GENERATOR.createDisplay(EntryIngredients.of(it.item), this)
             }?.let { display -> registry.add(display) }
-            ItemGeneratorFuel.fromEnchantedGeneratorFuel(it)?.run {
+            GeneratorFuel.fromEnchantedGeneratorFuel(it)?.run {
                 ENCHANTED_GENERATOR.createDisplay(EntryIngredients.of(it), this)
             }?.let { display -> registry.add(display) }
-            ItemGeneratorFuel.fromBrewGeneratorFuel(it)?.run {
+            GeneratorFuel.fromBrewGeneratorFuel(it)?.run {
                 BREW_GENERATOR.createDisplay(EntryIngredients.of(it), this)
             }?.let { display -> registry.add(display) }
             FluidGeneratorFuel.fromRedstoneGeneratorFuel(it)?.run {

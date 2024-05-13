@@ -7,7 +7,7 @@ import io.github.lucaargolo.extragenerators.common.blockentity.ItemGeneratorBloc
 import io.github.lucaargolo.extragenerators.common.entity.GeneratorAreaEffectCloudEntity
 import io.github.lucaargolo.extragenerators.common.resource.ResourceCompendium
 import io.github.lucaargolo.extragenerators.utils.FluidGeneratorFuel
-import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.InventoryUtils
 import io.github.lucaargolo.extragenerators.utils.InventoryUtils.fluidResourceFromMcBuffer
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
@@ -35,7 +35,7 @@ object PacketCompendium {
     fun onInitializeClient() {
         ClientPlayNetworking.registerGlobalReceiver(UPDATE_ITEM_GENERATOR_SCREEN) { client, _, buf, _ ->
             val long = buf.readLong()
-            val burningFuel = ItemGeneratorFuel.fromBuf(buf)
+            val burningFuel = GeneratorFuel.fromBuf(buf)
             client.execute {
                 (client.currentScreen as? ItemGeneratorScreen)?.screenHandler?.let {
                     it.energyStored = long
@@ -69,7 +69,7 @@ object PacketCompendium {
         }
         ClientPlayNetworking.registerGlobalReceiver(UPDATE_COLORFUL_GENERATOR_SCREEN) { client, _, buf, _ ->
             val long = buf.readLong()
-            val burningFuel = ItemGeneratorFuel.fromBuf(buf)
+            val burningFuel = GeneratorFuel.fromBuf(buf)
             client.execute {
                 (client.currentScreen as? ColorfulGeneratorScreen)?.screenHandler?.let {
                     it.energyStored = long

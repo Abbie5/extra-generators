@@ -2,7 +2,7 @@ package io.github.lucaargolo.extragenerators.common.resource
 
 import com.google.gson.JsonParser
 import io.github.lucaargolo.extragenerators.ExtraGenerators
-import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener
 import net.minecraft.item.ItemStack
@@ -13,10 +13,10 @@ import java.io.InputStreamReader
 
 class ItemGeneratorFuelResource: SimpleSynchronousResourceReloadListener {
 
-    private val ingredientsMap = linkedMapOf<String, LinkedHashMap<Ingredient, ItemGeneratorFuel>>()
-    val clientIngredientsMap = linkedMapOf<String, LinkedHashMap<Ingredient, ItemGeneratorFuel>>()
+    private val ingredientsMap = linkedMapOf<String, LinkedHashMap<Ingredient, GeneratorFuel>>()
+    val clientIngredientsMap = linkedMapOf<String, LinkedHashMap<Ingredient, GeneratorFuel>>()
 
-    fun test(id: String, itemStack: ItemStack): ItemGeneratorFuel? {
+    fun test(id: String, itemStack: ItemStack): GeneratorFuel? {
         val map = if(clientIngredientsMap.isEmpty()) ingredientsMap else clientIngredientsMap
         map[id]?.forEach { (ingredient, fuel) ->
             if(ingredient.test(itemStack)) return fuel
@@ -44,7 +44,7 @@ class ItemGeneratorFuelResource: SimpleSynchronousResourceReloadListener {
             val ingredientMapSize = buf.readInt()
             repeat(ingredientMapSize) {
                 val ingredient = Ingredient.fromPacket(buf)
-                val fuel = ItemGeneratorFuel.fromBuf(buf) ?: ItemGeneratorFuel(0, 0.0)
+                val fuel = GeneratorFuel.fromBuf(buf) ?: GeneratorFuel(0, 0.0)
                 clientIngredientsMap.getOrPut(ingredientsMapId) { linkedMapOf() } [ingredient] = fuel
             }
         }
@@ -64,7 +64,7 @@ class ItemGeneratorFuelResource: SimpleSynchronousResourceReloadListener {
                 val jsonArray = json.asJsonArray
                 jsonArray.forEach { jsonElement ->
                     val jsonObject = jsonElement.asJsonObject
-                    val generatorFuel = ItemGeneratorFuel.fromJson(jsonObject.get("fuel").asJsonObject)
+                    val generatorFuel = GeneratorFuel.fromJson(jsonObject.get("fuel").asJsonObject)
                     generatorFuel?.let {
                         ingredientsMap.getOrPut(id.toString()) { linkedMapOf() }[Ingredient.fromJson(jsonObject.get("ingredient"))] = it
                     }

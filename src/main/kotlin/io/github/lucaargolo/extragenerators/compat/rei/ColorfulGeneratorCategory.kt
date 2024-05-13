@@ -1,6 +1,6 @@
 package io.github.lucaargolo.extragenerators.compat.rei
 
-import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
 import me.shedaniel.math.Point
 import me.shedaniel.math.Rectangle
@@ -62,9 +62,9 @@ class ColorfulGeneratorCategory(private val id: String, private val block: Block
 
     override fun getDisplayHeight() = 44
 
-    fun createDisplay(redInput: List<EntryStack<ItemStack>>, greenInput: List<EntryStack<ItemStack>>, blueInput: List<EntryStack<ItemStack>>, output: ItemGeneratorFuel) = RecipeDisplay(categoryIdentifier, redInput, greenInput, blueInput, output)
+    fun createDisplay(redInput: List<EntryStack<ItemStack>>, greenInput: List<EntryStack<ItemStack>>, blueInput: List<EntryStack<ItemStack>>, output: GeneratorFuel) = RecipeDisplay(categoryIdentifier, redInput, greenInput, blueInput, output)
 
-    class RecipeDisplay(private val category: CategoryIdentifier<RecipeDisplay>, val redInput: List<EntryStack<ItemStack>>, val greenInput: List<EntryStack<ItemStack>>, val blueInput: List<EntryStack<ItemStack>>, val output: ItemGeneratorFuel): Display {
+    class RecipeDisplay(private val category: CategoryIdentifier<RecipeDisplay>, val redInput: List<EntryStack<ItemStack>>, val greenInput: List<EntryStack<ItemStack>>, val blueInput: List<EntryStack<ItemStack>>, val output: GeneratorFuel): Display {
 
         override fun getInputEntries() = mutableListOf<EntryIngredient>().also {
             it.add(EntryIngredient.of(redInput))

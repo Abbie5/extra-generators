@@ -15,7 +15,7 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.PacketByteBuf
 import kotlin.math.round
 
-data class FluidGeneratorFuel(override val burnTime: Int, var currentBurnTime: Int, val fluidInput: ResourceAmount<FluidVariant>, override val energyOutput: Double) : GeneratorFuel {
+data class FluidGeneratorFuel(override val burnTime: Int, var currentBurnTime: Int, val fluidInput: ResourceAmount<FluidVariant>, override val energyOutput: Double) : IGeneratorFuel {
 
     constructor(burnTime: Int, fluidInput: ResourceAmount<FluidVariant>, energyOutput: Double): this(burnTime, burnTime, fluidInput, energyOutput)
 

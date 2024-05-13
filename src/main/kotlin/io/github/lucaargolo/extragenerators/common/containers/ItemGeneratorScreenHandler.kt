@@ -2,7 +2,7 @@ package io.github.lucaargolo.extragenerators.common.containers
 
 import io.github.lucaargolo.extragenerators.common.blockentity.ItemGeneratorBlockEntity
 import io.github.lucaargolo.extragenerators.network.PacketCompendium
-import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.SimpleSidedInventory
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
@@ -12,7 +12,7 @@ import net.minecraft.screen.ScreenHandlerContext
 
 class ItemGeneratorScreenHandler(syncId: Int, playerInventory: PlayerInventory, entity: ItemGeneratorBlockEntity, context: ScreenHandlerContext): AbstractGeneratorScreenHandler<ItemGeneratorScreenHandler, ItemGeneratorBlockEntity>(ScreenHandlerCompendium.ITEM_GENERATOR, syncId, playerInventory, entity, context, PacketCompendium.UPDATE_ITEM_GENERATOR_SCREEN)  {
 
-    var burningFuel: ItemGeneratorFuel? = null
+    var burningFuel: GeneratorFuel? = null
 
     init {
         addSlot(SimpleSidedInventory.SimpleSlot(entity.itemInv, 0,80, 53))
@@ -49,7 +49,7 @@ class ItemGeneratorScreenHandler(syncId: Int, playerInventory: PlayerInventory, 
 
     override fun writeToBuf(buf: PacketByteBuf) {
         super.writeToBuf(buf)
-        (entity.burningFuel ?: ItemGeneratorFuel(0, 0.0)).toBuf(buf)
+        (entity.burningFuel ?: GeneratorFuel(0, 0.0)).toBuf(buf)
     }
 
 }

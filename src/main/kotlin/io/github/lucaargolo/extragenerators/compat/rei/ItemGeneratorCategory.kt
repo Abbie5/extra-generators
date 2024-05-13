@@ -1,6 +1,6 @@
 package io.github.lucaargolo.extragenerators.compat.rei
 
-import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
 import me.shedaniel.math.Point
 import me.shedaniel.math.Rectangle
@@ -57,9 +57,9 @@ class ItemGeneratorCategory(private val id: String, private val block: Block): D
 
     override fun getDisplayHeight() = 44
 
-    fun createDisplay(input: EntryIngredient, output: ItemGeneratorFuel) = RecipeDisplay(categoryIdentifier, input, output)
+    fun createDisplay(input: EntryIngredient, output: GeneratorFuel) = RecipeDisplay(categoryIdentifier, input, output)
 
-    class RecipeDisplay(private val category: CategoryIdentifier<RecipeDisplay>, val input: EntryIngredient, val output: ItemGeneratorFuel): Display {
+    class RecipeDisplay(private val category: CategoryIdentifier<RecipeDisplay>, val input: EntryIngredient, val output: GeneratorFuel): Display {
 
         override fun getInputEntries() = mutableListOf(input)
 

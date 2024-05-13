@@ -3,13 +3,13 @@ package io.github.lucaargolo.extragenerators.compat.emi.recipe
 import dev.emi.emi.api.stack.EmiIngredient
 import dev.emi.emi.api.widget.WidgetHolder
 import io.github.lucaargolo.extragenerators.compat.emi.ExtraGeneratorsCategory
-import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
 
 class ItemGeneratorEmiRecipe(
     category: ExtraGeneratorsCategory,
     private val input: EmiIngredient,
-    output: ItemGeneratorFuel
+    output: GeneratorFuel
 ) : AbstractExtraGeneratorsEmiRecipe(
     category,
     null,

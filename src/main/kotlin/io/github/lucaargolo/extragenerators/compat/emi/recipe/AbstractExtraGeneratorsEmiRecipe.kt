@@ -5,7 +5,7 @@ import dev.emi.emi.api.render.EmiTexture
 import dev.emi.emi.api.render.EmiTooltipComponents
 import dev.emi.emi.api.widget.WidgetHolder
 import io.github.lucaargolo.extragenerators.compat.emi.ExtraGeneratorsCategory
-import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.IGeneratorFuel
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
@@ -13,7 +13,7 @@ import net.minecraft.util.math.MathHelper
 abstract class AbstractExtraGeneratorsEmiRecipe(
     val generatorCategory: ExtraGeneratorsCategory,
     id: Identifier?,
-    val fuel: GeneratorFuel
+    val fuel: IGeneratorFuel
 ) : BasicEmiRecipe(
     generatorCategory,
     id,

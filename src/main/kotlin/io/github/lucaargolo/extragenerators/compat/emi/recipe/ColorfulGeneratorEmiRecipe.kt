@@ -3,17 +3,15 @@ package io.github.lucaargolo.extragenerators.compat.emi.recipe
 import dev.emi.emi.api.render.EmiTexture
 import dev.emi.emi.api.stack.EmiIngredient
 import dev.emi.emi.api.widget.WidgetHolder
-import io.github.lucaargolo.extragenerators.ExtraGenerators
 import io.github.lucaargolo.extragenerators.compat.emi.ExtraGeneratorsCategories
-import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import io.github.lucaargolo.extragenerators.utils.ModIdentifier
-import net.minecraft.util.Identifier
 
 class ColorfulGeneratorEmiRecipe(
     private val redInput: EmiIngredient,
     private val greenInput: EmiIngredient,
     private val blueInput: EmiIngredient,
-    private val output: ItemGeneratorFuel
+    private val output: GeneratorFuel
 ) : AbstractExtraGeneratorsEmiRecipe(
     ExtraGeneratorsCategories.COLORFUL_GENERATOR,
     null,

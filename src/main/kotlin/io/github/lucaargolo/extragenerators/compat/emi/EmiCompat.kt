@@ -10,7 +10,7 @@ import io.github.lucaargolo.extragenerators.common.blockentity.ColorfulGenerator
 import io.github.lucaargolo.extragenerators.common.resource.ResourceCompendium
 import io.github.lucaargolo.extragenerators.compat.emi.recipe.*
 import io.github.lucaargolo.extragenerators.utils.FluidGeneratorFuel
-import io.github.lucaargolo.extragenerators.utils.ItemGeneratorFuel
+import io.github.lucaargolo.extragenerators.utils.GeneratorFuel
 import net.minecraft.enchantment.EnchantmentLevelEntry
 import net.minecraft.item.EnchantedBookItem
 import net.minecraft.item.Item
@@ -112,15 +112,15 @@ class EmiCompat : EmiPlugin {
                 listOf(Items.POTION, Items.SPLASH_POTION, Items.TIPPED_ARROW, Items.LINGERING_POTION)
                     .map(Item::getDefaultStack)
                     .map { stack -> PotionUtil.setPotion(stack, it) }
-            }.associateWith(ItemGeneratorFuel::fromBrewGeneratorFuel)
+            }.associateWith(GeneratorFuel::fromBrewGeneratorFuel)
             .filter { it.value != null }
             .mapKeys { EmiStack.of(it.key) }
             .map { ItemGeneratorEmiRecipe(ExtraGeneratorsCategories.BREW_GENERATOR, it.key, it.value!!) }
             .forEach(registry::addRecipe)
 
         Registries.ITEM
-            .filter { ItemGeneratorFuel.fromBurnableGeneratorFuel(it) != null }
-            .groupBy(ItemGeneratorFuel::fromBurnableGeneratorFuel)
+            .filter { GeneratorFuel.fromBurnableGeneratorFuel(it) != null }
+            .groupBy(GeneratorFuel::fromBurnableGeneratorFuel)
             .mapValues { EmiIngredient.of(it.value.map(EmiStack::of)) }
             .map { ItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.BURNABLE_GENERATOR,
@@ -141,8 +141,8 @@ class EmiCompat : EmiPlugin {
             ) }.forEach(registry::addRecipe)
 
         Registries.ITEM
-            .filter { ItemGeneratorFuel.fromGluttonyGeneratorFuel(it) != null }
-            .groupBy(ItemGeneratorFuel::fromGluttonyGeneratorFuel)
+            .filter { GeneratorFuel.fromGluttonyGeneratorFuel(it) != null }
+            .groupBy(GeneratorFuel::fromGluttonyGeneratorFuel)
             .mapValues { EmiIngredient.of(it.value.map(EmiStack::of)) }
             .map { ItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.GLUTTONY_GENERATOR,
@@ -153,7 +153,7 @@ class EmiCompat : EmiPlugin {
         Registries.ENCHANTMENT
             .flatMap { (it.minLevel..it.maxLevel).map {
                 level -> EnchantedBookItem.forEnchantment(EnchantmentLevelEntry(it, level))
-            } }.associateWith(ItemGeneratorFuel::fromEnchantedGeneratorFuel)
+            } }.associateWith(GeneratorFuel::fromEnchantedGeneratorFuel)
             .mapKeys { EmiStack.of(it.key) }
             .map { ItemGeneratorEmiRecipe(
                 ExtraGeneratorsCategories.ENCHANTED_GENERATOR,
